@@ -5,7 +5,7 @@ import utils
 from pprint import pprint
 
 if world.dataset in ['gowalla', 'yelp2018', 'amazon-book', 'movielens']:
-    dataset = dataloader.Loader(path="../data/"+world.dataset)
+    dataset = dataloader.Loader(path="../data/"+world.dataset, augmentation_file=world.AUGMENTTATION)
 elif world.dataset == 'lastfm':
     dataset = dataloader.LastFM()
 

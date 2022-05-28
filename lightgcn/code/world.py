@@ -16,7 +16,7 @@ import multiprocessing
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 #args = parse_args()
 
-ROOT_PATH = "/home/baron/HW/gnn_recsy/lightgcn/"
+ROOT_PATH = "/Users/wangshihao/Research/SocialNetwork/final/lightgcn"
 CODE_PATH = join(ROOT_PATH, 'code')
 DATA_PATH = join(ROOT_PATH, 'data')
 BOARD_PATH = join(CODE_PATH, 'runs')
@@ -63,6 +63,9 @@ config['decay'] = 1e-4
 seed = 2020
 dataset = "movielens"
 model_name = 'lgn'
+AUGMENTTATION = "aug_25_99.txt"
+# AUGMENTTATION = None
+
 
 GPU = torch.cuda.is_available()
 device = torch.device('cuda' if GPU else "cpu")

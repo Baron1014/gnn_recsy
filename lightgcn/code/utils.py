@@ -70,8 +70,12 @@ def UniformSample_original_python(dataset):
     total_start = time()
     dataset : BasicDataset
     user_num = dataset.trainDataSize
-    users = np.random.randint(0, dataset.n_users, user_num)
     allPos = dataset.allPos
+    if world.AUGMENTTATION:
+        user_num += dataset.augDataSize
+        allPos = dataset.allaugPos
+        
+    users = np.random.randint(0, dataset.n_users, user_num)
     S = []
     sample_time1 = 0.
     sample_time2 = 0.
@@ -109,7 +113,11 @@ def getFileName():
     if world.model_name == 'mf':
         file = f"mf-{world.dataset}-{world.config['latent_dim_rec']}.pth.tar"
     elif world.model_name == 'lgn':
-        file = f"lgn-{world.dataset}-{world.config['lightGCN_n_layers']}-{world.config['latent_dim_rec']}.pth.tar"
+        if world.AUGMENTTATION:
+            aug  = world.AUGMENTTATION.split('.')[0]
+            file = f"lgn-{world.dataset}-{world.config['lightGCN_n_layers']}-{world.config['latent_dim_rec']}-{aug}.pth.tar"
+        else:
+            file = f"lgn-{world.dataset}-{world.config['lightGCN_n_layers']}-{world.config['latent_dim_rec']}.pth.tar"
     return os.path.join(world.FILE_PATH,file)
 
 def minibatch(*tensors, **kwargs):

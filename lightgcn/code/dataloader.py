@@ -221,7 +221,7 @@ class Loader(BasicDataset):
     gowalla dataset
     """
 
-    def __init__(self,config = world.config,path="../data/gowalla"):
+    def __init__(self,config = world.config,path="../data/gowalla", augmentation_file=False):
         # train or test
         cprint(f'loading [{path}]')
         self.split = config['A_split']
@@ -235,8 +235,12 @@ class Loader(BasicDataset):
         self.path = path
         trainUniqueUsers, trainItem, trainUser = [], [], []
         testUniqueUsers, testItem, testUser = [], [], []
+        augUniqueUsers, augItem, augUser = [], [], []
         self.traindataSize = 0
         self.testDataSize = 0
+        self.augDataSize = 0
+        self.augUserItemNet = None
+        self._augallPos = None
 
         with open(train_file) as f:
             for l in f.readlines():
@@ -271,6 +275,26 @@ class Loader(BasicDataset):
         self.testUniqueUsers = np.array(testUniqueUsers)
         self.testUser = np.array(testUser)
         self.testItem = np.array(testItem)
+
+        if augmentation_file:
+            with open("./augmentation/"+augmentation_file) as f:
+                for l in f.readlines():
+                    if len(l) > 0:
+                        l = l.strip('\n').split(' ')
+                        items = [int(i) for i in l[1:]]
+                        uid = int(l[0])
+                        augUniqueUsers.append(uid)
+                        augUser.extend([uid] * len(items))
+                        augItem.extend(items)
+                        self.augDataSize += len(items)
+            print(f"{self.augDataSize} interactions for augmentation")
+            
+            augtrainUser = np.array(trainUser + augUser)
+            augtrainItem = np.array(trainItem + augItem)
+            self.augUserItemNet = csr_matrix((np.ones(len(self.trainUser)+len(augUser)), (augtrainUser, augtrainItem)),
+                                      shape=(self.n_user, self.m_item))
+            self._augallPos = self.getaugUserPosItems(list(range(self.n_user)))
+
         
         self.Graph = None
         print(f"{self.trainDataSize} interactions for training")
@@ -310,6 +334,10 @@ class Loader(BasicDataset):
     def allPos(self):
         return self._allPos
 
+    @property
+    def allaugPos(self):
+        return self._augallPos
+
     def _split_A_hat(self,A):
         A_fold = []
         fold_len = (self.n_users + self.m_items) // self.folds
@@ -332,9 +360,13 @@ class Loader(BasicDataset):
         
     def getSparseGraph(self):
         print("loading adjacency matrix")
+        np_name = '/s_pre_adj_mat.npz'
+        if world.AUGMENTTATION:
+            aug = world.AUGMENTTATION.split('.')[0]
+            np_name = '/s_pre_adj_mat_{}.npz'.format(aug)
         if self.Graph is None:
             try:
-                pre_adj_mat = sp.load_npz(self.path + '/s_pre_adj_mat.npz')
+                pre_adj_mat = sp.load_npz(self.path + np_name)
                 print("successfully loaded...")
                 norm_adj = pre_adj_mat
             except :
@@ -342,7 +374,10 @@ class Loader(BasicDataset):
                 s = time()
                 adj_mat = sp.dok_matrix((self.n_users + self.m_items, self.n_users + self.m_items), dtype=np.float32)
                 adj_mat = adj_mat.tolil()
-                R = self.UserItemNet.tolil()
+                if world.AUGMENTTATION:
+                    R = self.augUserItemNet.tolil()
+                else:
+                    R = self.UserItemNet.tolil()
                 adj_mat[:self.n_users, self.n_users:] = R
                 adj_mat[self.n_users:, :self.n_users] = R.T
                 adj_mat = adj_mat.todok()
@@ -358,7 +393,7 @@ class Loader(BasicDataset):
                 norm_adj = norm_adj.tocsr()
                 end = time()
                 print(f"costing {end-s}s, saved norm_mat...")
-                sp.save_npz(self.path + '/s_pre_adj_mat.npz', norm_adj)
+                sp.save_npz(self.path + np_name, norm_adj)
 
             if self.split == True:
                 self.Graph = self._split_A_hat(norm_adj)
@@ -399,6 +434,12 @@ class Loader(BasicDataset):
         posItems = []
         for user in users:
             posItems.append(self.UserItemNet[user].nonzero()[1])
+        return posItems
+
+    def getaugUserPosItems(self, users):
+        posItems = []
+        for user in users:
+            posItems.append(self.augUserItemNet[user].nonzero()[1])
         return posItems
 
     # def getUserNegItems(self, users):
