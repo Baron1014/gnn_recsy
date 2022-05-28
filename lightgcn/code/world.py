@@ -16,7 +16,7 @@ import multiprocessing
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 #args = parse_args()
 
-ROOT_PATH = "/Users/wangshihao/Research/SocialNetwork/final/lightgcn"
+ROOT_PATH = "/home/baron/HW/gnn_recsy/lightgcn"
 CODE_PATH = join(ROOT_PATH, 'code')
 DATA_PATH = join(ROOT_PATH, 'data')
 BOARD_PATH = join(CODE_PATH, 'runs')
