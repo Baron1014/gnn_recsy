@@ -272,7 +272,13 @@ def getLabel(test_data, pred_data):
     for i in range(len(test_data)):
         groundTrue = test_data[i]
         predictTopK = pred_data[i]
-        pred = list(map(lambda x: x in groundTrue, predictTopK))
+        # pred = list(map(lambda x: x in groundTrue, predictTopK))
+        pred = []
+        for i in predictTopK:
+            if i in groundTrue:
+                pred.append(True)
+            else:
+                pred.append(False)
         pred = np.array(pred).astype("float")
         r.append(pred)
     return np.array(r).astype('float')
