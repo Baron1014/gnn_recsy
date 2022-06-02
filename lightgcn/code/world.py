@@ -63,8 +63,9 @@ config['decay'] = 1e-4
 seed = 2020
 dataset = "movielens"
 model_name = 'lgn'
-AUGMENTTATION = "aug_25_99.txt"
-# AUGMENTTATION = None
+# AUGMENTTATION = "aug_25_10.txt"
+AUGMENTTATION = None
+SIMUSERS = None
 
 
 GPU = torch.cuda.is_available()
@@ -89,7 +90,7 @@ if model_name not in all_models:
 # topks = eval(args.topks)
 # tensorboard = args.tensorboard
 # comment = args.comment
-TRAIN_epochs = 1000
+TRAIN_epochs = 500
 LOAD = 0
 PATH = "./checkpoints"
 topks = eval("[20]")

@@ -2,3 +2,6 @@
 lightgcn/code/__pycache__/
 lightgcn/code/lgn-movielens-3-64.pth.tar
 lightgcn/code/user_movie.dat
+../data
+lightgcn/code/checkpoints/
+lightgcn/data/movielens/

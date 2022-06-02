@@ -213,3 +213,14 @@ class LightGCN(BasicModel):
         inner_pro = torch.mul(users_emb, items_emb)
         gamma     = torch.sum(inner_pro, dim=1)
         return gamma
+
+    def getCosUserTop(self, users, k=5):
+        all_users, all_items = self.computer()
+        users_emb = all_users[users.long()]
+        users_emb_norm = users_emb / users_emb.norm(dim=1)[:, None]
+        all_users_emb = all_users / all_users.norm(dim=1)[:, None]
+        rating = torch.mm(users_emb_norm, all_users_emb.t())
+        for i, user in enumerate(users.long()):
+            rating[i, user] = torch.tensor(0)
+        _, rating_K = torch.topk(rating, k)
+        return rating_K
