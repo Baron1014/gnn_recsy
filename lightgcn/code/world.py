@@ -65,8 +65,8 @@ dataset = "movielens"
 model_name = 'lgn'
 # AUGMENTTATION = "aug_25_10.txt"
 AUGMENTTATION = None
-SIMUSERS = None
-
+SIMUSERS = "SimUser_25_3.txt"
+# SIMUSERS = None
 
 GPU = torch.cuda.is_available()
 device = torch.device('cuda' if GPU else "cpu")

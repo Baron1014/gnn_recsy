@@ -180,6 +180,8 @@ class LightGCN(BasicModel):
     
     def getEmbedding(self, users, pos_items, neg_items):
         all_users, all_items = self.computer()
+        if world.SIMUSERS:
+            all_users = self.TopUserMean(all_users, world.SIMUSERS)
         users_emb = all_users[users]
         pos_emb = all_items[pos_items]
         neg_emb = all_items[neg_items]
@@ -224,3 +226,22 @@ class LightGCN(BasicModel):
             rating[i, user] = torch.tensor(0)
         _, rating_K = torch.topk(rating, k)
         return rating_K
+    
+    def TopUserMean(self, all_user_emb, augmentation_file):
+        SimUsersMap = dict()
+        with open("./augmentation/"+augmentation_file) as f:
+            for l in f.readlines():
+                if len(l) > 0:
+                    l = l.strip('\n').split(' ')
+                    uer_simusers = [int(i) for i in l]
+                    uid = int(l[0])
+                    SimUsersMap[uid] = uer_simusers
+
+        adjust_embedding = []
+        for i in range(len(all_user_emb)):
+            emb = all_user_emb[i]
+            if i in SimUsersMap.keys():
+                emb = torch.mean(all_user_emb[SimUsersMap[i]], 0)
+            adjust_embedding.append(emb)
+        
+        return torch.stack(adjust_embedding, dim=0)

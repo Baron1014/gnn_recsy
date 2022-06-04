@@ -116,6 +116,9 @@ def getFileName():
         if world.AUGMENTTATION:
             aug  = world.AUGMENTTATION.split('.')[0]
             file = f"lgn-{world.dataset}-{world.config['lightGCN_n_layers']}-{world.config['latent_dim_rec']}-{aug}.pth.tar"
+        elif world.SIMUSERS:
+            aug  = world.SIMUSERS.split('.')[0]
+            file = f"lgn-{world.dataset}-{world.config['lightGCN_n_layers']}-{world.config['latent_dim_rec']}-{aug}.pth.tar"
         else:
             file = f"lgn-{world.dataset}-{world.config['lightGCN_n_layers']}-{world.config['latent_dim_rec']}.pth.tar"
     return os.path.join(world.FILE_PATH,file)

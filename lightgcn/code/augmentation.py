@@ -75,7 +75,7 @@ def user_user():
     world.cprint(f"loaded model weights from {weight_file}")
 
     # weak users
-    weak_num = 51
+    weak_num = 25
     weak_users = [i for i in range(len(dataset.allPos)) if len(dataset.allPos[i]) <= weak_num]
     allPos = dataset.getUserPosItems(weak_users)
     batch_users_gpu = torch.Tensor(weak_users).long()
