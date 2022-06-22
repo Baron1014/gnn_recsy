@@ -88,6 +88,7 @@ class LightGCN(BasicModel):
         self.config = config
         self.dataset : dataloader.BasicDataset = dataset
         self.__init_weight()
+        self.SimUsersMap = None
 
     def __init_weight(self):
         self.num_users  = self.dataset.n_users
@@ -228,20 +229,21 @@ class LightGCN(BasicModel):
         return rating_K
     
     def TopUserMean(self, all_user_emb, augmentation_file):
-        SimUsersMap = dict()
-        with open("./augmentation/"+augmentation_file) as f:
-            for l in f.readlines():
-                if len(l) > 0:
-                    l = l.strip('\n').split(' ')
-                    uer_simusers = [int(i) for i in l]
-                    uid = int(l[0])
-                    SimUsersMap[uid] = uer_simusers
+        if self.SimUsersMap == None:
+            self.SimUsersMap = dict()
+            with open("./augmentation/"+augmentation_file) as f:
+                for l in f.readlines():
+                    if len(l) > 0:
+                        l = l.strip('\n').split(' ')
+                        uer_simusers = [int(i) for i in l]
+                        uid = int(l[0])
+                        self.SimUsersMap[uid] = uer_simusers
 
         adjust_embedding = []
         for i in range(len(all_user_emb)):
             emb = all_user_emb[i]
-            if i in SimUsersMap.keys():
-                emb = torch.mean(all_user_emb[SimUsersMap[i]], 0)
+            if i in self.SimUsersMap.keys():
+                emb = torch.mean(all_user_emb[self.SimUsersMap[i]], 0)
             adjust_embedding.append(emb)
         
         return torch.stack(adjust_embedding, dim=0)

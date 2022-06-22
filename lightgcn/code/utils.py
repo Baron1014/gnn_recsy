@@ -109,15 +109,25 @@ def set_seed(seed):
         torch.cuda.manual_seed_all(seed)
     torch.manual_seed(seed)
 
-def getFileName():
+def getFileName(NGCF=False):
+    if NGCF:
+        file = f"NGCF_{world.dataset}.pth.tar"
+        return os.path.join(world.FILE_PATH,file)
+        
     if world.model_name == 'mf':
         file = f"mf-{world.dataset}-{world.config['latent_dim_rec']}.pth.tar"
     elif world.model_name == 'lgn':
-        if world.AUGMENTTATION:
+        if world.AUGMENTTATION and world.SIMUSERS:
+            item_aug  = world.AUGMENTTATION.split('.')[0]
+            aug  = world.SIMUSERS.split('.')[0]
+            aug = aug.replace('/', '_')
+            file = f"lgn-{world.dataset}-{world.config['lightGCN_n_layers']}-{world.config['latent_dim_rec']}-{aug}-{item_aug}.pth.tar"
+        elif world.AUGMENTTATION:
             aug  = world.AUGMENTTATION.split('.')[0]
             file = f"lgn-{world.dataset}-{world.config['lightGCN_n_layers']}-{world.config['latent_dim_rec']}-{aug}.pth.tar"
         elif world.SIMUSERS:
             aug  = world.SIMUSERS.split('.')[0]
+            aug = aug.replace('/', '_')
             file = f"lgn-{world.dataset}-{world.config['lightGCN_n_layers']}-{world.config['latent_dim_rec']}-{aug}.pth.tar"
         else:
             file = f"lgn-{world.dataset}-{world.config['lightGCN_n_layers']}-{world.config['latent_dim_rec']}.pth.tar"

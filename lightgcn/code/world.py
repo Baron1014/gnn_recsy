@@ -30,7 +30,7 @@ if not os.path.exists(FILE_PATH):
 
 
 config = {}
-all_dataset = ['lastfm', 'gowalla', 'yelp2018', 'amazon-book', 'movielens']
+all_dataset = ['lastfm', 'gowalla', 'yelp2018', 'amazon-book', 'movielens', 'douban', 'yelp']
 all_models  = ['mf', 'lgn']
 config['batch_size'] = 4096
 # config['bpr_batch_size'] = args.bpr_batch
@@ -47,7 +47,7 @@ config['batch_size'] = 4096
 config['A_split'] = False
 config['bigdata'] = False
 
-config['bpr_batch_size'] = 2048
+config['bpr_batch_size'] = 4096
 config['dropout'] = 0
 config['keep_prob']  = 0.6
 config['A_n_fold'] = 100
@@ -63,10 +63,10 @@ config['decay'] = 1e-4
 seed = 2020
 dataset = "movielens"
 model_name = 'lgn'
-# AUGMENTTATION = "aug_25_10.txt"
-AUGMENTTATION = None
-SIMUSERS = "SimUser_25_3.txt"
-# SIMUSERS = None
+AUGMENTTATION = "NGCF_aug_51_hotItem65_10.txt"
+# AUGMENTTATION = None
+# SIMUSERS = "SimUser_51_3.txt"
+SIMUSERS = None
 
 GPU = torch.cuda.is_available()
 device = torch.device('cuda' if GPU else "cpu")

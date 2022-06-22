@@ -27,6 +27,9 @@ if world.LOAD:
     except FileNotFoundError:
         print(f"{weight_file} not exists, start from beginning")
 Neg_k = 1
+# load_file = "/home/baron/HW/gnn_recsy/lightgcn/code/checkpoints/lgn-movielens-3-64.pth.tar"
+# Recmodel.load_state_dict(torch.load(load_file,map_location=torch.device('cpu')))
+# world.cprint(f"loaded model weights from {load_file}")
 
 # init tensorboard
 if world.tensorboard:
@@ -40,7 +43,7 @@ else:
 try:
     for epoch in range(world.TRAIN_epochs):
         start = time.time()
-        if epoch %10 == 0:
+        if (epoch+1) %10 == 0:
             cprint("[TEST]")
             Procedure.Test(dataset, Recmodel, epoch, w, world.config['multicore'])
         output_information = Procedure.BPR_train_original(dataset, Recmodel, bpr, epoch, neg_k=Neg_k,w=w)
