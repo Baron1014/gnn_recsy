@@ -44,7 +44,6 @@ if __name__ == '__main__':
         t1 = time()
         loss, mf_loss, emb_loss = 0., 0., 0.
         n_batch = data_generator.n_train // args.batch_size + 1
-
         for idx in range(n_batch):
             users, pos_items, neg_items = data_generator.sample()
             u_g_embeddings, pos_i_g_embeddings, neg_i_g_embeddings = model(users,
@@ -63,7 +62,7 @@ if __name__ == '__main__':
             mf_loss += batch_mf_loss
             emb_loss += batch_emb_loss
 
-        if (epoch + 1) % 10 != 0:
+        if (epoch + 1) % 25 != 0:
             if args.verbose > 0 and epoch % args.verbose == 0:
                 perf_str = 'Epoch %d [%.1fs]: train==[%.5f=%.5f + %.5f]' % (
                     epoch, time() - t1, loss, mf_loss, emb_loss)
@@ -100,9 +99,9 @@ if __name__ == '__main__':
 
         # *********************************************************
         # save the user & item embeddings for pretraining.
-        if ret['recall'][0] == cur_best_pre_0 and args.save_flag == 1:
-            torch.save(model.state_dict(), args.weights_path + str(epoch) + '.pkl')
-            print('save the weights in path: ', args.weights_path + str(epoch) + '.pkl')
+        # if ret['recall'][0] == cur_best_pre_0 and args.save_flag == 1:
+        torch.save(model.state_dict(), args.weights_path + "NGCF_{}.pth.tar".format(args.dataset))
+            # print('save the weights in path: ', args.weights_path  + "NGCF_{}.pth.tar".format(args.dataset))
 
     recs = np.array(rec_loger)
     pres = np.array(pre_loger)

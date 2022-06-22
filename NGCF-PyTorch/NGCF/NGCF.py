@@ -149,3 +149,16 @@ class NGCF(nn.Module):
         neg_i_g_embeddings = i_g_embeddings[neg_items, :]
 
         return u_g_embeddings, pos_i_g_embeddings, neg_i_g_embeddings
+
+    def get_user_embedding(self):
+        return self.embedding_dict['user_emb']
+    
+    def getCosUserTop(self, test_users, all_users_emb, k=5):
+        users_emb = all_users_emb[test_users.long()]
+        users_emb_norm = users_emb / users_emb.norm(dim=1)[:, None]
+        all_users_emb = all_users_emb / all_users_emb.norm(dim=1)[:, None]
+        rating = torch.mm(users_emb_norm, all_users_emb.t())
+        for i, user in enumerate(test_users.long()):
+            rating[i, user] = torch.tensor(0)
+        _, rating_K = torch.topk(rating, k)
+        return rating_K
